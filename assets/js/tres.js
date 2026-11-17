@@ -10,8 +10,24 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 const ROJO = 0xe5061c;
 const ROJO_CSS = '#e5061c';
 const reducido = matchMedia('(prefers-reduced-motion: reduce)').matches;
-// misma corona que el símbolo #logo-nucleo del HTML (caja de 200 × 200)
-const CORONA = 'M64 80 L60 54 L81 66 L100 44 L119 66 L140 54 L136 80 Z M64 85 H136 V91 H64 Z M64.5 50a4.5 4.5 0 1 1-9 0a4.5 4.5 0 1 1 9 0Z M105 40a5 5 0 1 1-10 0a5 5 0 1 1 10 0Z M144.5 50a4.5 4.5 0 1 1-9 0a4.5 4.5 0 1 1 9 0Z';
+// rectángulo redondeado en un contexto 2D
+function rr(g, x, y, w, h, r) {
+  g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r);
+  g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath();
+}
+// el logo: candado rojo con la F calada (igual que el símbolo #logo-nucleo del HTML, caja de 200 × 200)
+function candado(g, hueco) {
+  g.save();
+  g.strokeStyle = g.fillStyle = ROJO_CSS;
+  g.lineWidth = 15; g.lineCap = 'butt';
+  g.beginPath(); g.moveTo(63, 94); g.lineTo(63, 66); g.arc(100, 66, 37, Math.PI, 0); g.lineTo(137, 94); g.stroke();
+  g.beginPath(); rr(g, 30, 86, 140, 108, 22); g.fill();
+  g.globalAlpha = 0.5; g.lineWidth = 3; g.strokeStyle = hueco;
+  g.beginPath(); rr(g, 41, 97, 118, 86, 13); g.stroke(); g.globalAlpha = 1;
+  g.fillStyle = hueco; g.font = 'italic 700 92px "Bodoni Moda", Didot, Georgia, serif';
+  g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.fillText('F', 100, 172);
+  g.restore();
+}
 
 const suave = (x) => x * x * (3 - 2 * x);
 const salida = (x) => 1 - Math.pow(1 - x, 3);
@@ -35,7 +51,6 @@ function sello(px, { fondo = null, anillo = true } = {}) {
   if (fondo) { g.fillStyle = fondo; g.fillRect(0, 0, px, px); }
   g.scale(px / 200, px / 200);
   g.fillStyle = g.strokeStyle = ROJO_CSS;
-  let k = 1;
   if (anillo) {                       // aro + texto circular (medalla)
     g.lineWidth = 2.4; g.beginPath(); g.arc(100, 100, 96, 0, Math.PI * 2); g.stroke();
     g.lineWidth = 1.2; g.beginPath(); g.arc(100, 100, 72, 0, Math.PI * 2); g.stroke();
@@ -46,16 +61,16 @@ function sello(px, { fondo = null, anillo = true } = {}) {
       g.save(); g.translate(100 + Math.cos(a) * 84, 100 + Math.sin(a) * 84); g.rotate(a + Math.PI / 2);
       g.fillText(l, 0, 0); g.restore();
     });
-    k = 0.74;
-  } else {                            // doble aro del logo (placa del candado)
+    // el candado del logo en el centro
+    g.translate(100, 100); g.scale(0.6, 0.6); g.translate(-100, -108);
+    candado(g, fondo || '#0a0607');
+  } else {                            // placa del candado 3D: doble aro y una F grande
     g.lineWidth = 6; g.beginPath(); g.arc(100, 100, 93, 0, Math.PI * 2); g.stroke();
     g.lineWidth = 1.6; g.beginPath(); g.arc(100, 100, 82, 0, Math.PI * 2); g.stroke();
+    g.font = 'italic 700 132px "Bodoni Moda", Didot, Georgia, serif';
+    g.textAlign = 'center'; g.textBaseline = 'alphabetic';
+    g.fillText('F', 100, 146);
   }
-  g.translate(100, 100); g.scale(k, k); g.translate(-100, -100);
-  g.fill(new Path2D(CORONA));
-  g.font = 'italic 700 96px "Bodoni Moda", Didot, Georgia, serif';
-  g.textAlign = 'center'; g.textBaseline = 'alphabetic';
-  g.fillText('F', 100, 166);
   const t = new THREE.CanvasTexture(c);
   t.colorSpace = THREE.SRGBColorSpace;
   t.anisotropy = 8;
