@@ -204,8 +204,10 @@ async function umbral() {
     base.y = vh * (0.5 - centro) - 0.78 * s;              // 0.78: el arco sube el centro visual
   }
 
-  caja.classList.add('con-3d');          // el texto baja; luego se mide el hueco
+  // si el 3D llega tarde (ya se puso el logo plano o ya se pulsó «Entrar»), no se monta encima
+  if (caja.classList.contains('plano') || caja.classList.contains('abriendo')) { r.dispose(); return; }
   medir();
+  caja.classList.add('con-3d');          // el candado aparece con un fundido; el texto no se mueve
   addEventListener('resize', medir);
 
   const reloj = new THREE.Clock();
@@ -239,7 +241,7 @@ async function umbral() {
       });
       // 3) golpe de luz y el candado vuela hacia la cámara
       rojaI.intensity = 90 + 260 * Math.sin(Math.PI * tramo(a, 0.15, 0.7));
-      const v = entrada(tramo(a, 0.55, 1.5));
+      const v = entrada(tramo(a, 0.45, 1.3));   // termina cuando la entrada ya se está fundiendo
       candado.rotation.y = giro + v * Math.PI * 1.2;
       candado.position.set(0, base.y * (1 - v), v * 10.5);
     }

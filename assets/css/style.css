@@ -86,25 +86,29 @@ p { margin: 0 0 1em; }
 .btn--ancho { width: 100%; }
 
 /* ---------- umbral 18+ : candado 3D (assets/js/tres.js) ---------- */
+/* La disposición es la del 3D desde el primer momento (texto abajo, candado arriba):
+   así no hay un salto cuando carga Three.js. Si el 3D no arranca, main.js pone .plano
+   y el logo SVG aparece centrado. */
 .umbral {
   position: fixed; inset: 0; z-index: 1000;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  padding: 24px 16px;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+  padding: 24px 16px max(5vh, 24px);
   background:
     radial-gradient(50% 42% at 50% 34%, rgba(var(--acento-rgb), .30), transparent 72%),
     radial-gradient(120% 70% at 50% 115%, rgba(var(--acento-rgb), .22), transparent 60%),
     #050304;
-  transition: opacity .6s ease 1.05s;
+  transition: opacity .7s ease .85s;
 }
-html.umbral-ok .umbral { display: none; }
-.umbral.con-3d { justify-content: flex-end; padding-bottom: max(5vh, 24px); }
-.umbral__3d { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+html.umbral-ok .umbral, html:not(.js) .umbral { display: none; }
+.umbral.plano { justify-content: center; padding-bottom: 24px; }
+.umbral__3d { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0; transition: opacity .9s ease; }
+.umbral.con-3d .umbral__3d { opacity: 1; }
 .umbral__caja {
   position: relative; z-index: 2; width: min(520px, 100%); text-align: center;
   transition: opacity .45s, transform .45s;
 }
-.umbral__logo { width: 128px; height: 128px; margin: 0 auto 14px; color: var(--acento); filter: drop-shadow(0 0 24px rgba(var(--acento-rgb), .55)); }
-.umbral.con-3d .umbral__logo { display: none; }
+.umbral__logo { display: none; width: 128px; height: 128px; margin: 0 auto 14px; color: var(--acento); filter: drop-shadow(0 0 24px rgba(var(--acento-rgb), .55)); }
+.umbral.plano .umbral__logo { display: block; }
 .umbral__pre { margin: 0; font: italic 500 1.45rem/1 var(--serif); color: var(--acento-claro); }
 .umbral__t {
   font: 800 clamp(2.8rem, 11vw, 4.4rem)/.95 var(--serif); text-transform: uppercase; letter-spacing: .02em;

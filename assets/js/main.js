@@ -19,14 +19,24 @@
   if (umbral && !raiz.classList.contains('umbral-ok')) {
     var entrar = document.getElementById('umbral-entrar');
     entrar.focus({ preventScroll: true });
+    // si el candado 3D no ha arrancado en 2,5 s (sin WebGL, CDN caído…), logo plano centrado
+    setTimeout(function () {
+      if (!umbral.classList.contains('con-3d')) umbral.classList.add('plano');
+    }, 2500);
+    // Una sola apertura: el candado se abre (0–1,3 s), la portada empieza a entrar a los 0,85 s
+    // mientras la entrada se funde (0,85–1,55 s) y a los 1,6 s la entrada desaparece.
     entrar.addEventListener('click', function () {
+      if (umbral.classList.contains('abriendo')) return;          // un segundo clic no hace nada
       guarda('df-umbral', '1');
       document.dispatchEvent(new CustomEvent('umbral:entrar'));   // tres.js abre el candado
       umbral.classList.add('abriendo');
       setTimeout(function () {
+        document.dispatchEvent(new CustomEvent('umbral:revela')); // arranca la portada
+      }, reducido ? 0 : 850);
+      setTimeout(function () {
         raiz.classList.add('umbral-ok');
         document.dispatchEvent(new CustomEvent('umbral:fuera'));
-      }, reducido ? 0 : 1700);
+      }, reducido ? 0 : 1600);
     });
   }
 
@@ -77,9 +87,13 @@
       titulo.setAttribute('aria-label', 'Domina Franches');
     }
   }
-  function portadaLista() { requestAnimationFrame(function () { portada.classList.add('lista'); }); }
-  if (raiz.classList.contains('umbral-ok')) portadaLista();
-  else document.addEventListener('umbral:fuera', portadaLista, { once: true });
+  // visita repetida (sin umbral): esperar a que se pinte el estado inicial para que haya transición;
+  // viniendo del umbral, la portada ya está pintada detrás y se arranca en el acto
+  if (raiz.classList.contains('umbral-ok')) {
+    requestAnimationFrame(function () { requestAnimationFrame(function () { portada.classList.add('lista'); }); });
+  } else {
+    document.addEventListener('umbral:revela', function () { portada.classList.add('lista'); }, { once: true });
+  }
 
   /* ---------- cita palabra a palabra ---------- */
   var cita = document.getElementById('cita');
