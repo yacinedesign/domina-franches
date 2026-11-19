@@ -110,8 +110,11 @@ html.umbral-ok .umbral, html:not(.js) .umbral { display: none; }
 .umbral__logo { display: none; width: 128px; height: 128px; margin: 0 auto 14px; color: var(--acento); filter: drop-shadow(0 0 24px rgba(var(--acento-rgb), .55)); }
 .umbral.plano .umbral__logo { display: block; }
 .umbral__pre { margin: 0; font: italic 500 1.45rem/1 var(--serif); color: var(--acento-claro); }
+/* «FRANCHES» mide 5,74 em en Bodoni Moda 800: el tope por ancho de pantalla hace que quepa
+   siempre, aunque el móvil tenga la letra del sistema aumentada (por eso no basta con rem) */
 .umbral__t {
-  font: 800 clamp(2.8rem, 11vw, 4.4rem)/.95 var(--serif); text-transform: uppercase; letter-spacing: .02em;
+  font: 800 min(clamp(2.8rem, 11vw, 4.4rem), calc((100vw - 48px) / 6.2))/.95 var(--serif);
+  text-transform: uppercase; letter-spacing: .02em; white-space: nowrap; color: #fff;
   margin: 4px 0 16px; text-shadow: 0 8px 40px rgba(0, 0, 0, .8);
 }
 .umbral__txt { color: var(--texto-2); font-size: .95rem; max-width: 430px; margin: 0 auto; }
@@ -168,7 +171,7 @@ html.umbral-ok .umbral, html:not(.js) .umbral { display: none; }
 .portada__texto { position: relative; z-index: 3; padding-bottom: 28px; }
 .portada__t {
   font: 800 clamp(3.4rem, 7.6vw, 8rem)/.88 var(--serif);
-  text-transform: uppercase; letter-spacing: -.02em;
+  text-transform: uppercase; letter-spacing: -.02em; white-space: nowrap; color: #fff;
   margin: 0 0 22px;
   margin-right: -14vw;                   /* el nombre pisa un poco la foto */
   text-shadow: 0 6px 40px rgba(0,0,0,.55);
@@ -438,7 +441,7 @@ html.js .revela.dentro { opacity: 1; transform: none; }
   background: radial-gradient(closest-side, rgba(var(--acento-rgb), .35), transparent);
   filter: blur(30px);
 }
-html.js .portada .palabra { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .06em; margin-bottom: -.06em; }
+html.js .portada .palabra { display: inline-block; overflow: hidden; vertical-align: top; white-space: nowrap; padding-bottom: .06em; margin-bottom: -.06em; }
 html.js .portada .letra { display: inline-block; transform: translateY(110%); transition: transform 1s var(--curva); transition-delay: calc(.3s + var(--i) * 60ms); }
 html.js .portada .etiqueta, html.js .portada__pre, html.js .portada__lead, html.js .portada__intro,
 html.js .portada__claves li, html.js .portada__btns, html.js .portada__nota, html.js .portada__sello {
@@ -605,7 +608,11 @@ html.js .interludio__cita.dentro .firma { clip-path: inset(-30px); }
             mask-image: linear-gradient(180deg, #000 78%, transparent 100%);
   }
   .portada__texto { padding: 0 var(--gutter) 70px; margin-top: -40px; }
-  .portada__t { margin-right: 0; }
+  /* en móvil el nombre ocupa todo el ancho: tamaño según la pantalla, para que «FRANCHES» quepa entero */
+  .portada__t { margin-right: 0; font-size: min(4.6rem, calc((100vw - 2 * var(--gutter)) / 6)); }
+  .portada__pre { font-size: max(1.5rem, .34em); }
+  .portada .etiqueta { letter-spacing: .16em; font-size: .64rem; }
+  .portada .etiqueta::before { width: 22px; }
   .portada__baja { display: none; }
   .portada__sello { left: 14px; top: auto; bottom: 20%; width: 92px; }
   .portada__vertical { right: 12px; top: 38%; font-size: .6rem; letter-spacing: .34em; }
